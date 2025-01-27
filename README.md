@@ -2,7 +2,7 @@ A tailor-made static site generator CLI for my website: [https://dasomi.neocitie
 
 # Compiling
 
-Create a directory called build and change directory to it, then run *cmake ..*
+Create a directory called build and change directory to it, then run `cmake ..`
 
 # How to use
 
