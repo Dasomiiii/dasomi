@@ -1,0 +1,20 @@
+title : Math Formula For Calculating The Length of String Lights
+date  : 2024 / 12 / 06
+tags  : math
+
+===
+
+Yesterday, I wrote this math equation for precisely (I think) calculating the length of a string of lights wrapped around a christmas tree – assuming the tree is shaped like a perfect cone and that the lights are as tighly and evenly wrapped around the cone as possible.
+
+[img] "images/math_string_lights.jpg"
+
+Excuse the Swedish! The variables are described as followed:<br>
+<ul>
+    <li>H: the tree's height</li>
+    <li>r: the tree's radius</li>
+    <li>v: the amount of revolutions</li>
+</ul>
+
+This is hardly a feat in the math world, and my equations are probably quite bloated, but I'm still quite happy with it, alright? :)
+<br>
+You can play around with it [link]"https://www.desmos.com/calculator/nyz2guyqol"(here on Desmos) if you'd like!

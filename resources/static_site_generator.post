@@ -1,0 +1,283 @@
+title : Building a Static Site Generator
+date  : 2024 / 12 / 09
+tags  : programming
+===
+
+If you're a Neocitizen, you know what a _static
+site generator_ is (abbreviated as SSG going forward) and why they're so useful, so
+I won't patronize you by giving you an introduction. There are a lot of open source options
+available, but I find it interesting to make my own things, and the learning curve of
+a third-party tool would likely outlast my development time anyway. I also get full
+control over syntax and error messaging, I can fine-tune stuff I dislike about the
+design, and because my program is very small, it is much faster than most SSGs since they
+need to bend to all sorts of users' different needs. My SSG is only designed with this
+site in mind, which admittedly makes it less impressive than prevailing SSGs, but it's
+still cool!!! Aye????
+
+The program's not _fully_ done yet, but it is pretty darn near operational and I'm pretty
+happy with how breezy the development has been! This post was fully generated with
+it.
+
+# Program Usage
+
+The program takes in .post files from a user-specified source directory and spits out .html
+files to a user-specified output directory. Running the program in the terminal looks
+like this:
+[code]
+dasomi --source source/ --output output/
+[code]
+# .post Syntax
+
+Before you start writing the post's contents, you have to set a few attributes. The
+attribute section for this post looks like this:
+[code]
+title : Building a Static Site Generator
+date  : 2024 / 12 / 09
+===
+[code]
+When the program reaches those equal-signs, it starts parsing the remaining file as
+content for the post.
+
+You can create headers by starting a line with a hashtag followed by a white-space
+character. Like so:<br>
+\# Whatever
+
+You can insert images by referencing them like so:<br>
+\[img] "filepath\_to\_the\_image.jpg"
+[img] "images/math_string_lights.jpg"
+
+You can make text *bold* by \*surrounding it with star-symbols\*.
+
+You can make text _italic_ by \_surrounding it with underscores\_.
+
+You can [link]"https://www.youtube.com/watch?v=nX5hmh2_bTI"(create hyperlinks) by wrapping
+text like this: \[link]"whatever site address"(the text you want to be clickable).
+
+You can insert code snippets by writing:<br>
+\[code]<br>
+Imagine there's a bunch of code here<br>
+\[code]
+
+# Closing Words
+
+There are still a few things that need to be done before I can comfortably deem the program
+"operational." Mainly: automatically cloning image and font files to the output directory,
+making a separate file format for the homepage, and implementing post-tags. When that's
+done, I'll probably put it out on GitHub to prove that I made it. In the meantime, you
+can have this function that parses .post files:
+
+[code]
+static bool get_html_from_post(String *dest, char *c)
+{
+    if (!*c) return false;
+
+    dest->clear();
+    char last_char = *(c - 1);
+
+    bool is_text_bold      = false;
+    bool is_text_italic    = false;
+
+    size_t i;
+
+    while (*c) {
+        if (last_char != '\\') {
+            if (*c == '#') {
+                ++c;
+                if (isspace(*c)) {
+                    eat_spaces(&c);
+                    dest->append_string("<h2>");
+                    while (*c && *c != '\n') {
+                        dest->append(*c);
+                        ++c;
+                    }
+                    dest->append_string("</h2>\n");
+                    goto end;
+                }
+            }
+            else if (*c == '[') {
+                ++c;
+                key_buf.clear();
+                while (*c && (*c != ']')) {
+                    key_buf.append(*c);
+                    ++c;
+                }
+                ++c;
+                eat_spaces(&c);
+
+                if (compare_string(key_buf.buf, "img")) {
+                    if (*c != '"') {
+                        /*
+                        printf("Warning: Missing '\"' after [img] in '%s'!\n",
+                               filepath);
+                        */
+                        printf("Warning: Missing '\"' after [img]!\n");
+                        goto end;
+                    }
+                    ++c;
+
+                    image_filepath_buf.clear();
+                    while (*c && (*c != '"')) {
+                        if (*c == '\n') {
+                            /*
+                            printf("Warning: Missing '\"' at end of image filepath in '%s'!\n",
+                                   filepath);
+                            */
+                            printf("Warning: Missing '\"' at end of image filepath!\n");
+                            ++c;
+                            goto end;
+                        }
+                        image_filepath_buf.append(*c);
+                        ++c;
+                    }
+                    ++c;
+                    dest->append_string("<img src=\"");
+                    dest->append_string(image_filepath_buf.buf);
+                    dest->append_string("\"></img>\n");
+                }
+                else if (compare_string(key_buf.buf, "link")) {
+                    if (*c != '"') {
+                        /*
+                        printf("Warning: Missing '\"' before link address in '%s'!\n",
+                               filepath);
+                        */
+                        printf("Warning: Missing '\"' before link address!\n");
+                        goto end;
+                    }
+
+                    dest->append_string("<a href=");
+                    ++c;
+                    while (*c && (*c != '"')) {
+                        dest->append(*c);
+                        ++c;
+                    }
+                    dest->append('>');
+
+                    ++c;
+                    eat_spaces(&c);
+
+                    if (*c != '(') {
+                        /*
+                        printf("Warning: Missing left parentheses after [link] in '%s'!\n",
+                               filepath);
+                        */
+                        printf("Warning: Missing left parentheses after [link]!\n");
+                        goto end;
+                    }
+                    last_char = *c;
+                    ++c;
+
+                    while (true) {
+                        if (last_char != '\\') {
+                            if (*c == ')') {
+                                goto end_parsing_clickable_text;
+                            }
+                        }
+                        if (!*c) {
+                            /*
+                            printf("Warning: Missing right parentheses after hyperlink text in '%s'!\n",
+                                   filepath);
+                            */
+                            printf("Warning: Missing right parentheses after hyperlink text!\n");
+                            goto end;
+                        }
+                        dest->append(*c);
+                        last_char = *c;
+                        ++c;
+                    }
+                end_parsing_clickable_text:
+                    dest->append_string("</a>");
+                }
+                else if (compare_string(key_buf.buf, "code")) {
+                    dest->append_string("<pre class=\"code-snippet\">\n");
+                    dest->append_string("<code>");
+
+                    const char end_key[] = "\[code]";
+                    while (*c) {
+                        if (last_char != '\\') {
+                            char const *c_before_looking_for_end_mark = c;
+                            i = 0;
+                            while (*c && end_key[i] && (*c == end_key[i])) {
+                                ++c;
+                                ++i;
+                                if (i >= sizeof(end_key) - 1/*null terminator*/) {
+                                    // We found the end of the code segment!
+                                    while (isspace(dest->buf[dest->length - 1])) {
+                                        dest->pop();
+                                    }
+                                    dest->append_string("</code>\n");
+                                    dest->append_string("</pre>\n");
+                                    goto end;
+                                }
+                            }
+                            while (c_before_looking_for_end_mark < c) {
+                                dest->append(*c_before_looking_for_end_mark);
+                                ++c_before_looking_for_end_mark;
+                            }
+                        }
+                        switch (*c) {
+                            default:
+                                dest->append(*c);
+                                break;
+                            case '<':
+                                dest->append_string("&lt;");
+                                break;
+                            case '>':
+                                dest->append_string("&gt;");
+                                break;
+                            case '\\':
+                                if (*(c + 1) && (*(c + 1) != '[')) {
+                                    dest->append('\\');
+                                }
+                                break;
+                        }
+                        last_char = *c;
+                        ++c;
+                    }
+                    printf("Warning: Code segment didn't end!\n");
+                }
+                else {
+                    /*
+                    printf("Warning: Unrecognized post attribute '%s' in '%s'\n",
+                           key_buf.buf, filepath);
+                    */
+                    printf("Warning: Unrecognized post attribute '%s'\n", key_buf.buf);
+                }
+                goto end;
+            }
+            else if (*c == '*') {
+                if (is_text_bold)
+                    dest->append_string("</b>");
+                else
+                    dest->append_string("<b>");
+                is_text_bold = !is_text_bold;
+                goto end;
+            }
+            else if (*c == '_') {
+                if (is_text_italic)
+                    dest->append_string("</i>");
+                else
+                    dest->append_string("<i>");
+                is_text_italic = !is_text_italic;
+                goto end;
+            }
+        }
+
+        if (*c == '\\') {
+            if (last_char == '\\') {
+                dest->append('\\');
+            }
+        }
+        else {
+            dest->append(*c);
+        }
+
+    end:
+        last_char = *c;
+        ++c;
+    }
+
+    dest->append_string(c);
+
+    return true;
+}
+[code]
