@@ -10,11 +10,11 @@ Create a directory and put all your resource files there, like images, fonts, st
 Then run `./dasomi -resources your_resource_directory/ -output your_output_directory/`. If the output
 directory doesn't exist, it'll be created. If it does exist, it'll get replaced.
 
-There are some example post files in resources/ that you can look at to understand the post format.
-
 It doesn't matter what subdirectories you put your resource files in; all file types will automatically get sorted
 to their respective subdirectories in the output directory. Images will get put into images/, fonts will
 be put into fonts/, etc.
+
+There are some example post files in resources/ that you can look at to understand the post format.
 
 Who am I kidding? No one but me's gonna fucking use this program. I just want the codebase to be comprehensible,
 that's all.
