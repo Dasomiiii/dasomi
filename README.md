@@ -15,4 +15,5 @@ It doesn't matter what subdirectories you put your files in; all file types will
 to their respective subdirectories in the output directory. Images will get put into images/, fonts will
 be put into fonts/, etc.
 
-Who am I kidding? No one but me's gonna fucking use this program! I just want the codebase to be comprehendable.
+Who am I kidding? No one but me's gonna fucking use this program! I just want the codebase to be comprehendable,
+that's all.
