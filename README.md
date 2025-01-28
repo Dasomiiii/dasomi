@@ -11,8 +11,7 @@ Then run `./dasomi -resources your_resource_directory/ -output your_output_direc
 directory doesn't exist, it'll be created. If it does exist, it'll get replaced.
 
 It doesn't matter what subdirectories you put your resource files in; all file types will automatically get sorted
-to their respective subdirectories in the output directory. Images will get put into images/, fonts will
-be put into fonts/, etc.
+to their respective subdirectories in the output directory. Images will get put into images/, fonts into fonts/, etc.
 
 There are some example post files in resources/ that you can look at to understand the post format.
 
