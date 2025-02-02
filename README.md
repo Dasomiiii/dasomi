@@ -12,8 +12,3 @@ It doesn't matter what subdirectories you put your resource files in; all file t
 to their respective subdirectories in the output directory. Images will get put into images/, fonts into fonts/, etc.
 
 There are some example post files in resources/ that you can look at to understand the post format.
-
-...
-
-Who am I kidding? No one but me's gonna fucking use this program. I just want the codebase to be comprehensible,
-that's all.
